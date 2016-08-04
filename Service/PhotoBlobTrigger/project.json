@@ -1,0 +1,12 @@
+{
+  "frameworks": {
+    "net46": {
+      "dependencies": {
+        "Microsoft.ProjectOxford.Emotion": "1.0.310",
+        "Newtonsoft.Json": "8.0.3",
+        "WindowsAzure.Storage": "7.0.0",
+        "Microsoft.AspNet.SignalR.Client": "2.2.0"
+      }
+    }
+  }
+}
