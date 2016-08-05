@@ -1,0 +1,10 @@
+    using Microsoft.AspNet.SignalR;
+    using Microsoft.AspNet.SignalR.Hubs;
+    [HubName("EmotionPhotoHub")]
+    public class EmotionPhotoHub : Hub
+    {
+        public void PhotoUploaded(Models.UploadedPhotoStatus status)
+        {
+            Clients.Others.PhotoUploaded(status);
+        }
+    }

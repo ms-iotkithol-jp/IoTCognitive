@@ -1,0 +1,74 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CurrentPhoto.aspx.cs" Inherits="EGPhotoEmotionWeb.CurrentPhoto" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Current Photo and Emotion Level</title>
+    <style>
+        body {
+            font-size:16px;
+        }
+    </style>
+    <script type="text/javascript" src="Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery.signalR-2.1.2.min.js"></script>
+    <script type="text/javascript" src="SignalR/hubs"></script>
+    <script type="text/javascript">
+        var comfortableHub = $.connection.EmotionPhotoHub;
+        comfortableHub.on("PhotoUploaded", function (packet) {
+            var ndid = document.getElementById('notice-device-id');
+            var ndimguri = document.getElementById('notice-image-uri');
+            var ndimg = document.getElementById('notice-image');
+            var ndang = document.getElementById('notice-anger');
+            var ndnop = document.getElementById('notice-number-of-person');
+            var ndcnt = document.getElementById('notice-contempt');
+            var nddsg = document.getElementById('notice-disgust');
+            var ndfer = document.getElementById('notice-fear');
+            var ndhpn = document.getElementById('notice-happiness');
+            var ndneu = document.getElementById('notice-neutral');
+            var ndsad = document.getElementById('notice-sadness');
+            var ndspr = document.getElementById('notice-suprise');
+            var nt = document.getElementById('notice-time');
+            ndid.innerHTML = packet.DeviceId;
+            ndimguri.innerHTML = packet.FileUri;
+            ndimg.src = packet.FileUri;
+            ndnop.innerHTML = packet.NumOfPerson;
+            ndang.innerHTML = packet.Anger;
+            ndcnt.innerHTML = packet.Contempt;
+            nddsg.innerHTML = packet.Disgust;
+            ndfer.innerHTML = packet.Fear;
+            ndhpn.innerHTML = packet.Happiness;
+            ndneu.innerHTML = packet.Neutral;
+            ndsad.innerHTML = packet.Sadness;
+            ndspr.innerHTML = packet.Suprise;
+            nt.innerHTML = packet.Time;
+        });
+        $.connection.hub.start();
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+        <table>
+            <tr><td><div id="notice-device-id" /></td></tr>
+            <tr><td><div id="notice-image-uri" /></td></tr>
+            <tr><td><div id="notice-time" /></td></tr>
+        </table>
+        <table>
+            <tr><td rowspan="9"><img id="notice-image" /></td><td colspan="2"><div id="notice-number-of-person" /></td></tr>
+            <tr><td>軽蔑</td><td><div id="notice-contempt" /></td></tr>
+            <tr><td>怒り</td><td><div id="notice-anger" /></td></tr>
+            <tr><td>いとわしさ</td><td><div id="notice-disgust" /></td></tr>
+            <tr><td>恐れ</td><td><div id="notice-fear" /></td></tr>
+            <tr><td>幸せ</td><td><div id="notice-happiness" /></td></tr>
+            <tr><td>真顔</td><td><div id="notice-neutral" /></td></tr>
+            <tr><td>悲しみ</td><td><div id="notice-sadness" /></td></tr>
+            <tr><td>驚き</td><td><div id="notice-suprise" /></td></tr>
+            <tr><td></td><td><img src="Content/QRcode.gif" /></td></tr>
+        </table>
+    
+    </div>
+    </form>
+</body>
+</html>
