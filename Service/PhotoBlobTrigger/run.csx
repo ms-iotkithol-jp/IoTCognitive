@@ -30,7 +30,7 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
         int numOfPerson=emotionsResult.Length;
 
         var regx = new System.Text.RegularExpressions.Regex(
-@"^(?<deviceId>\w+)_(?<yyyy>[0-9]{4})(?<MM>[0-9]{2})(?<dd>[0-9]{2})_(?<hh>[0-9]{2})_(?<mm>[0-9]{2})_(?<ss>[0-9]{2})_Pro\.jpg$");
+@"^(?<deviceId>[\w\-.]+)_(?<yyyy>[0-9]{4})(?<MM>[0-9]{2})(?<dd>[0-9]{2})_(?<hh>[0-9]{2})_(?<mm>[0-9]{2})_(?<ss>[0-9]{2})_Pro\.jpg$");
         var match = regx.Match(myBlob.Name);
         var deviceId = match.Groups["deviceId"].Value;
         var datetime = new string[7];
@@ -118,7 +118,7 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
             log.Info("None of Humans exist.");
         }
         var hubConnection = new Microsoft.AspNet.SignalR.Client.HubConnection("http://[Web-App-Name].azurewebsites.net");
-        var proxy = hubConnection.CreateHubProxy("PhotoUploadHub");
+        var proxy = hubConnection.CreateHubProxy("EmotionPhotoHub");
         hubConnection.Start().Wait();
         proxy.Invoke("PhotoUploaded",new []{uploadedStatus        });
     }
