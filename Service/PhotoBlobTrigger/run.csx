@@ -117,7 +117,7 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
         {
             log.Info("None of Humans exist.");
         }
-        var hubConnection = new Microsoft.AspNet.SignalR.Client.HubConnection("http://egphotoemotionweb.azurewebsites.net");
+        var hubConnection = new Microsoft.AspNet.SignalR.Client.HubConnection("http://[Web-App-Name].azurewebsites.net");
         var proxy = hubConnection.CreateHubProxy("PhotoUploadHub");
         hubConnection.Start().Wait();
         proxy.Invoke("PhotoUploaded",new []{uploadedStatus        });

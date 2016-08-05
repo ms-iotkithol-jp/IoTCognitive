@@ -94,7 +94,7 @@ namespace PhotoUploader
             try
             {
                 await mediaCaptureManager.CapturePhotoToStorageFileAsync(imageProperties, photoStorageFile);
-                var fileName = "device-" + deviceId + "-" + DateTime.Now.ToString("yyyyMMdhhmmssfff") + ".jpg";
+                var fileName = "device-" + deviceId + "_" + DateTime.Now.ToString("yyyyMMdd_HH_mm_ss") + "_Pro.jpg";
                 var blockBlob = photoContainer.GetBlockBlobReference(fileName);
                 await blockBlob.UploadFromFileAsync(photoStorageFile);
                 Debug.WriteLine(string.Format("Uploaded: {0} at {1}", fileName, DateTime.Now.ToString("yyyy/MM/dd - hh:mm:ss")));

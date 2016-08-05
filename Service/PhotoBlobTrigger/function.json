@@ -5,13 +5,13 @@
       "type": "blobTrigger",
       "direction": "in",
       "path": "photos/{detect}.jpg",
-      "connection": "photoemotion_STORAGE"
+      "connection": "[connection_STORAGE]"
     },
      {
       "name": "table",
       "type": "table",
       "tableName": "EmotionScores",
-      "connection": "photoemotion_STORAGE",
+      "connection": "[connection_STORAGE]",
       "direction": "in"
     }
   ],
