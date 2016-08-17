@@ -29,39 +29,49 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
         double supriseTotal=0;
         int numOfPerson=emotionsResult.Length;
 
+        string deviceId = "";
+        DateTime uploadedTime;
         var regx = new System.Text.RegularExpressions.Regex(
-@"^(?<deviceId>[\w\-.]+)_(?<yyyy>[0-9]{4})(?<MM>[0-9]{2})(?<dd>[0-9]{2})_(?<hh>[0-9]{2})_(?<mm>[0-9]{2})_(?<ss>[0-9]{2})_Pro\.jpg$");
+    @"^(?<deviceId>[\w\-.]+)_(?<yyyy>[0-9]{4})(?<MM>[0-9]{2})(?<dd>[0-9]{2})_(?<hh>[0-9]{2})_(?<mm>[0-9]{2})_(?<ss>[0-9]{2})_Pro\.jpg$");
         var match = regx.Match(myBlob.Name);
-        var deviceId = match.Groups["deviceId"].Value;
-        var datetime = new string[7];
-        int index = 0;
-        datetime[index++] = match.Groups["yyyy"].Value;
-        datetime[index++] = match.Groups["MM"].Value;
-        datetime[index++] = match.Groups["dd"].Value;
-        datetime[index++] = match.Groups["hh"].Value;
-        datetime[index++] = match.Groups["mm"].Value;
-        datetime[index++] = match.Groups["ss"].Value;
-        datetime[index++] = "000";
-
-        var datetimeInt = new int[datetime.Length];
-        for (int i = 0; i < datetime.Length; i++)
+        if (match.Length > 0)
         {
-            if (i > 0)
-            {
-                var dt = datetime[i];
-                if (datetime[i].StartsWith("0"))
-                {
-                    dt = datetime[i].Substring(1);
-                }
-                datetimeInt[i] = int.Parse(dt);
-            }
-            else
-            {
-                datetimeInt[i] = int.Parse(datetime[i]);
-            }
-        }
+            deviceId = match.Groups["deviceId"].Value;
+            var datetime = new string[7];
+            int index = 0;
+            datetime[index++] = match.Groups["yyyy"].Value;
+            datetime[index++] = match.Groups["MM"].Value;
+            datetime[index++] = match.Groups["dd"].Value;
+            datetime[index++] = match.Groups["hh"].Value;
+            datetime[index++] = match.Groups["mm"].Value;
+            datetime[index++] = match.Groups["ss"].Value;
+            datetime[index++] = "000";
 
-        var uploadedTime= new DateTime(datetimeInt[0], datetimeInt[1], datetimeInt[2], datetimeInt[3], datetimeInt[4], datetimeInt[5], datetimeInt[6]);
+            var datetimeInt = new int[datetime.Length];
+            for (int i = 0; i < datetime.Length; i++)
+            {
+                if (i > 0)
+                {
+                    var dt = datetime[i];
+                    if (datetime[i].StartsWith("0"))
+                    {
+                        dt = datetime[i].Substring(1);
+                    }
+                    datetimeInt[i] = int.Parse(dt);
+                }
+                else
+                {
+                    datetimeInt[i] = int.Parse(datetime[i]);
+                }
+            }
+
+            uploadedTime = new DateTime(datetimeInt[0], datetimeInt[1], datetimeInt[2], datetimeInt[3], datetimeInt[4], datetimeInt[5], datetimeInt[6]);
+        }
+        else
+        {
+            deviceId = myBlob.Name.Substring(0, myBlob.Name.LastIndexOf("."));
+            uploadedTime = DateTime.Now;
+        }
         var uploadedStatus = new UploadedPhotoStatus(){
                DeviceId=deviceId,
                Time=uploadedTime,
@@ -71,9 +81,9 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
         if(emotionsResult.Count()>0)
         {
             log.Info("Human Existed!");
-            index=0;
+            var index=0;
             foreach(var em in emotionsResult){
-                var timestamp=datetime[0]+datetime[1]+datetime[2]+datetime[3]+datetime[4]+datetime[5]+datetime[6];
+                var timestamp = uploadedTime.ToString("yyyyMMddHHmmssfff");
                 var emotionScores = new EmotionScores()
                 {
                     PartitionKey = deviceId,
@@ -110,8 +120,6 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
                 uploadedStatus.Sadness=sadnessTotal/numOfPerson;
                 uploadedStatus.Suprise=supriseTotal/numOfPerson;
             }
- 
-
         }
         else
         {
@@ -120,7 +128,8 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
         var hubConnection = new Microsoft.AspNet.SignalR.Client.HubConnection("http://[Web-App-Name].azurewebsites.net");
         var proxy = hubConnection.CreateHubProxy("EmotionPhotoHub");
         hubConnection.Start().Wait();
-        proxy.Invoke("PhotoUploaded",new []{uploadedStatus        });
+        proxy.Invoke("PhotoUploaded",new []{uploadedStatus        }).Wait();
+        log.Info("Notified - PhotoUploaded");
     }
     catch (Exception ex){
         log.Info("Exception:"+ex.Message);
@@ -182,3 +191,4 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
         /// </summary>
         public double Suprise { get; set; }
     }
+
