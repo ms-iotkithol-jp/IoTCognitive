@@ -59,9 +59,9 @@ namespace PhotoUploader
                 await mediaCaptureManager.StartPreviewAsync();
                 photoUploadTimer = new DispatcherTimer();
                 photoUploadTimer.Interval = TimeSpan.FromSeconds(photoUploadIntervalSec);
-                photoUploadTimer.Tick +=async (s, o) =>
+                photoUploadTimer.Tick += (s, o) =>
                 {
-                    await UploadPhoto();
+                    StartUploadPhoto();
                 };
                 photoUploadTimer.Start();
             }
@@ -88,7 +88,6 @@ namespace PhotoUploader
 
         private async Task UploadPhoto()
         {
-            photoUploadTimer.Stop();
             photoStorageFile = await Windows.Storage.KnownFolders.PicturesLibrary.CreateFileAsync(capturedPhotoFile, CreationCollisionOption.ReplaceExisting);
             var imageProperties = ImageEncodingProperties.CreateJpeg();
             try
@@ -103,8 +102,38 @@ namespace PhotoUploader
             {
                 Debug.Write(ex.Message);
             }
-            photoUploadTimer.Start();
         }
+
+        private void StartUploadPhoto()
+        {
+            photoUploadTimer.Stop();
+            if (countdownTimer != null)
+            {
+                countdownTimer.Stop();
+            }
+            countdownIndex = countdownIntervalSec;
+            countdownTimer = new DispatcherTimer();
+            countdownTimer.Interval = TimeSpan.FromSeconds(1);
+            countdownTimer.Tick += async (o, s) =>
+            {
+                tbStatus.Text = countdownIndex.ToString();
+                if (countdownIndex == 0)
+                {
+                    countdownTimer.Stop();
+                    await UploadPhoto();
+                    tbStatus.Visibility = Visibility.Collapsed;
+                    photoUploadTimer.Start();
+                }
+                countdownIndex--;
+            };
+            tbStatus.Text = countdownIndex.ToString();
+            tbStatus.Visibility = Visibility.Visible;
+            countdownTimer.Start();
+        }
+
+        DispatcherTimer countdownTimer;
+        int countdownIndex = 5;
+        int countdownIntervalSec = 5;
 
         private void FixDeviceId()
         {
