@@ -61,7 +61,6 @@
             <tr><td>真顔</td><td><div id="notice-neutral" /></td></tr>
             <tr><td>悲しみ</td><td><div id="notice-sadness" /></td></tr>
             <tr><td>驚き</td><td><div id="notice-suprise" /></td></tr>
-            <tr><td></td><td><img src="Content/QRcode.gif" /></td></tr>
         </table>
     
     </div>

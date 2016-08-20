@@ -8,7 +8,7 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Canvas x:Name="canvasPicture">
+        <Canvas x:Name="canvasPicture" VerticalAlignment="Center" HorizontalAlignment="Center">
             <CaptureElement x:Name="previewElement"/>
         </Canvas>
         <TextBlock x:Name="tbStatus" FontSize="144" Text="15" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
