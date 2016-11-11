@@ -16,8 +16,14 @@ public async static void Run(CloudBlockBlob myBlob, CloudTable table, TraceWrite
     log.Info("myBlob:StorageUri.PrimaryUri="+myBlob.StorageUri.PrimaryUri.AbsoluteUri);
     log.Info("myBlob:Name="+myBlob.Name);
  
-    try{   
-        var emotionsResult= await emotionSC.RecognizeAsync(myBlob.StorageUri.PrimaryUri.AbsoluteUri);
+    try{
+        Microsoft.ProjectOxford.Emotion.Contract.Emotion[] emotionsResult = null;
+        using (var memoryStream = new MemoryStream())
+        {
+            await myBlob.DownloadToStreamAsync(memoryStream);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            emotionsResult = await emotionSC.RecognizeAsync(memoryStream);
+        }
         log.Info("Succeeded to call RecognizeAsync");
         double angerTotal = 0;
         double contemptTotal=0;
